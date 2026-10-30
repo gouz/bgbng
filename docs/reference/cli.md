@@ -21,9 +21,9 @@ the instance whose worktree contains the current directory, or `main` (the main 
 | Command | Description |
 |---|---|
 | `bgbng encrypt [value]` | Print `enc:v1:...` for the value, read from stdin if not given. |
-| `bgbng key init [--pub <file>]` | Create `.bgbng/recipients.txt` and `.bgbng/key.age`. Default public key: `<identity>.pub`. |
-| `bgbng key add <who>` | Add recipients and re-encrypt `.bgbng/key.age`. `who`: `@github-user`, a `.pub` file, or a public key line. |
-| `bgbng key rotate` | New data key: re-encrypts every `enc:v1:` value of `bgbng.toml` and `.bgbng/key.age`. |
+| `bgbng key init [--pub <file>]` | Create `.bgbng/recipients.txt` and `.bgbng/key.enc`. Default public key: `<identity>.pub`. |
+| `bgbng key add <who>` | Add recipients and re-encrypt `.bgbng/key.enc`. `who`: `@github-user`, a `.pub` file, or a public key line. |
+| `bgbng key rotate` | New data key: re-encrypts every `enc:v1:` value of `bgbng.toml` and `.bgbng/key.enc`. |
 
 Secret commands act on the worktree that contains the current directory.
 
@@ -44,8 +44,7 @@ bgbng doesn't load any `.env` itself: your tools read the generated files.
 |---|---|---|
 | `bgbng.toml` | yes | [Configuration](config.md) |
 | `.bgbng/recipients.txt` | yes | SSH public keys allowed to decrypt |
-| `.bgbng/key.age` | yes | Data key, encrypted with age for the recipients |
+| `.bgbng/key.enc` | yes | Data key, encrypted for each recipient |
 | `.worktrees/<name>/` | no (added to `.git/info/exclude`) | Instance worktrees |
 | `.git/bgbng/state.json` | no | Instances, slots, PIDs |
 | `.git/bgbng/logs/<name>.<proc>.log` | no | Process output |
-| `.git/bgbng/key-<hash>` | no (mode 600) | Decrypted data key cache |

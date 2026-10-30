@@ -139,7 +139,7 @@ const key = new Clipse("key", "manage who can decrypt the secrets").addSubcomman
     .addOptions({ pub: { description: "SSH public key file (default: ~/.ssh/id_ed25519.pub)", optional: true } })
     .action(async (_, { pub }) => {
       await keyInit(toplevel(), pub);
-      console.log("created .bgbng/key.age and .bgbng/recipients.txt, commit them");
+      console.log("created .bgbng/key.enc and .bgbng/recipients.txt, commit them");
     }),
   new Clipse("add", "give a teammate access")
     .addArguments([{ name: "who", description: "@github-user, a .pub file, or a public key line" }])

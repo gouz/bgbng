@@ -23,7 +23,7 @@ Then commit:
 git add .bgbng && git commit -m "bgbng: give access to octocat"
 ```
 
-Values in `bgbng.toml` don't change: only `.bgbng/key.age` is re-encrypted.
+Values in `bgbng.toml` don't change: only `.bgbng/key.enc` is re-encrypted.
 
 ## Revoke access
 

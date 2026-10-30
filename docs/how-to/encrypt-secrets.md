@@ -2,8 +2,7 @@
 
 Goal: commit secret values in `bgbng.toml` so that only your team can read them.
 
-Requires [age](https://age-encryption.org) (`brew install age`) and an SSH key
-(`~/.ssh/id_ed25519` or `~/.ssh/id_rsa`).
+Requires an ed25519 or RSA SSH key without passphrase (`~/.ssh/id_ed25519` or `~/.ssh/id_rsa`).
 
 ## Set up encryption once per repo
 
@@ -12,7 +11,7 @@ bgbng key init
 git add .bgbng && git commit -m "bgbng: add encryption key"
 ```
 
-This creates `.bgbng/recipients.txt` (your public key) and `.bgbng/key.age`
+This creates `.bgbng/recipients.txt` (your public key) and `.bgbng/key.enc`
 (the data key, encrypted for those recipients). Both are safe to commit.
 
 To use another public key than `~/.ssh/id_ed25519.pub`:
@@ -50,10 +49,10 @@ bgbng env
 cat .env
 ```
 
-The first decryption asks for your SSH key passphrase, if it has one. After that,
-the data key is cached in `.git/bgbng/` and you are not asked again.
-
 ## Use a key outside `~/.ssh`
+
+Also the way out if your usual key has a passphrase: create a dedicated one with
+`ssh-keygen -t ed25519 -N "" -f ~/.ssh/bgbng`.
 
 ```sh
 export BGBNG_IDENTITY=~/.ssh/work
@@ -61,6 +60,6 @@ export BGBNG_IDENTITY=~/.ssh/work
 
 ## Troubleshooting
 
-- `age: error: no identity matched any of the recipients`: your key is not in
+- `your SSH key is not in .bgbng/recipients.txt`: your key is not in
   `.bgbng/recipients.txt`. Ask a teammate to [add you](team-access.md).
 - `warning: .env is not gitignored`: add the file to `.gitignore`, it contains decrypted secrets.

@@ -14,7 +14,7 @@ bgbng down -a            # stop everything
 
 ## Install
 
-Requires [Bun](https://bun.sh), git, and [age](https://age-encryption.org) for secrets (`brew install age`).
+Requires [Bun](https://bun.sh) and git. Secrets need an ed25519 or RSA SSH key without passphrase.
 
 ```sh
 git clone git@github.com:gouz/bgbng.git && cd bgbng

@@ -61,10 +61,15 @@ bgbng runs with `--no-env-file` and lets each tool read its own generated files.
 ## Secrets: envelope encryption with SSH keys
 
 Values are encrypted with AES-256-GCM using a random 32-byte **data key**. Each value gets
-its own random IV, and GCM detects tampering. The data key itself is encrypted with
-[age](https://age-encryption.org) for every SSH public key in `.bgbng/recipients.txt`.
-age accepts SSH ed25519 and RSA keys natively, so developers reuse the key they already
-have on GitHub.
+its own random IV, and GCM detects tampering. The data key itself is encrypted for every SSH public key in
+`.bgbng/recipients.txt`, one line per key in `.bgbng/key.enc`, so developers reuse the key
+they already have on GitHub:
+
+- **ed25519**: the key is converted to X25519 (same curve), an ephemeral X25519 key does
+  Diffie-Hellman with it, HKDF-SHA256 derives a key that encrypts the data key with AES-256-GCM.
+- **RSA**: the data key is encrypted with RSA-OAEP-SHA256.
+
+Everything uses Bun's built-in crypto, no external tool.
 
 Two layers make team changes cheap:
 
@@ -83,9 +88,8 @@ Two layers make team changes cheap:
   gitignored.
 - Not covered: who wrote a value. Use signed commits (git supports SSH signing) if you need it.
 
-### The key cache
+### No passphrase-protected keys
 
-age can't use `ssh-agent`, so a passphrase-protected key would prompt on every `bgbng up`.
-After the first decryption, bgbng caches the data key in `.git/bgbng/key-<hash>` (mode 600),
-named after the content of `key.age`: after a rotation, the cache naturally misses and
-you decrypt once more.
+Reading an encrypted OpenSSH private key needs bcrypt_pbkdf, which isn't in Bun's crypto,
+and `ssh-agent` can sign but not decrypt. bgbng refuses such keys: point `BGBNG_IDENTITY`
+to a key without passphrase.
