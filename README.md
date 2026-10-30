@@ -1,5 +1,7 @@
 # bgbng
 
+[![Docs](https://img.shields.io/badge/docs-gouz.github.io%2Fbgbng-ff5722)](https://gouz.github.io/bgbng/)
+
 **bigbang**: run several copies of your dev environment side by side.
 
 Each instance is a git worktree with its own ports and its own generated `.env` files.
