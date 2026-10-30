@@ -49,13 +49,20 @@ bgbng env
 cat .env
 ```
 
-## Use a key outside `~/.ssh`
+## Use another key
 
-Also the way out if your usual key has a passphrase: create a dedicated one with
-`ssh-keygen -t ed25519 -N "" -f ~/.ssh/bgbng`.
+To use another key than `~/.ssh/id_ed25519` or `~/.ssh/id_rsa`:
 
 ```sh
 export BGBNG_IDENTITY=~/.ssh/work
+```
+
+If your usual key has a passphrase, create a dedicated one without, and give its public key
+to `bgbng key init --pub` or `bgbng key add`:
+
+```sh
+ssh-keygen -t ed25519 -N "" -f ~/.ssh/bgbng
+export BGBNG_IDENTITY=~/.ssh/bgbng
 ```
 
 ## Troubleshooting

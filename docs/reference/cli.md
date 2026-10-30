@@ -31,7 +31,7 @@ Secret commands act on the worktree that contains the current directory.
 
 | Variable | Description |
 |---|---|
-| `BGBNG_IDENTITY` | SSH private key used to decrypt. Default: `~/.ssh/id_ed25519`, then `~/.ssh/id_rsa`. |
+| `BGBNG_IDENTITY` | SSH private key used to decrypt (ed25519 or RSA, without passphrase). Default: `~/.ssh/id_ed25519`, then `~/.ssh/id_rsa`. |
 
 ## Variables passed to processes and `setup`
 
