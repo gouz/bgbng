@@ -23,6 +23,8 @@ bun install && bun link
 
 ## Documentation
 
+Read it online: **<https://gouz.github.io/bgbng/>**
+
 The docs follow the [Diátaxis](https://diataxis.fr) framework:
 
 - **Tutorial**: [Your first parallel environments](docs/tutorials/first-environments.md)
