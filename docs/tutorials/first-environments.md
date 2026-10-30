@@ -3,7 +3,7 @@
 In this tutorial you will run three copies of a small web server at the same time,
 each on its own port, each with its own `.env`. It takes about ten minutes.
 
-You need Bun, git and bgbng installed (see the [README](../../README.md#install)).
+You need Bun, git and bgbng installed (see [Install](../index.md#install)).
 
 ## 1. Create a project
 
