@@ -1,0 +1,109 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  create_release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: softprops/action-gh-release@v2
+        with:
+          name: ${{ github.ref_name }}
+          generate_release_notes: true
+
+  build_release:
+    name: Build Release
+    needs: create_release
+    outputs:
+      output_linux_amd: ${{ steps.compute_sha.outputs.output_LINUX_AMD_SHA }}
+      output_linux_arm: ${{ steps.compute_sha.outputs.output_LINUX_ARM_SHA }}
+      output_mac_amd: ${{ steps.compute_sha.outputs.output_MAC_AMD_SHA }}
+      output_mac_arm: ${{ steps.compute_sha.outputs.output_MAC_ARM_SHA }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            release_suffix: linux-amd
+            compile_options: --target=bun-linux-x64-modern
+            sha_field: LINUX_AMD_SHA
+          - os: ubuntu-latest
+            release_suffix: linux-arm
+            compile_options: --target=bun-linux-arm64
+            sha_field: LINUX_ARM_SHA
+          - os: macos-latest
+            release_suffix: mac
+            compile_options: --target=bun-darwin-arm64
+            sha_field: MAC_ARM_SHA
+          - os: macos-15
+            release_suffix: mac_intel
+            compile_options: --target=bun-darwin-x64
+            sha_field: MAC_AMD_SHA
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: oven-sh/setup-bun@v2
+      - uses: actions/checkout@v4
+      - run: bun install
+      - run: bun make:exe ${{ matrix.compile_options }}
+      # bun 1.4 leaves an invalid ad-hoc signature: macOS kills the binary at launch
+      - name: Re-sign macOS binary
+        if: runner.os == 'macOS'
+        run: codesign --force --sign - ./exe/bgbng
+      - name: Package
+        run: |
+          cp ./exe/bgbng bgbng_${{ matrix.release_suffix }}
+          tar czf bgbng_${{ matrix.release_suffix }}.tar.gz bgbng_${{ matrix.release_suffix }}
+      - name: Compute sha
+        id: compute_sha
+        run: |
+          sha=($(shasum -a 256 ./bgbng_${{ matrix.release_suffix }}.tar.gz))
+          echo "output_${{ matrix.sha_field }}=${{ matrix.sha_field }}-$sha" >> "$GITHUB_OUTPUT"
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: bgbng_${{ matrix.release_suffix }}.tar.gz
+
+  update_brew_formula:
+    name: Update formula
+    runs-on: ubuntu-latest
+    needs: build_release
+    steps:
+      - name: Update formula
+        uses: yodamad-actions/brew-formula-update@0.5
+        with:
+          file: bgbng.rb
+          owner: gouz
+          repo: homebrew-tools
+          version: ${{ github.ref_name }}
+          # the action reads `fields` and `auto_merge` (its action.yml lists
+          # other names, hence a harmless "unexpected input" warning)
+          fields: ${{ toJSON(needs.build_release.outputs) }}
+          token: ${{ secrets.BREW_TOKEN }}
+          # merging right after creating the pull request races GitHub's
+          # mergeability check ("405 Base branch was modified"): merged below
+          auto_merge: false
+      - name: Merge formula pull request
+        env:
+          GH_TOKEN: ${{ secrets.BREW_TOKEN }}
+          TITLE: Update bgbng.rb to ${{ github.ref_name }}
+        # the open pull requests are listed rather than searched: the search
+        # index can miss the one created a second before
+        run: |
+          for attempt in 1 2 3 4 5 6; do
+            pr=$(gh pr list --repo gouz/homebrew-tools --state open --json number,title --jq "map(select(.title == env.TITLE))[0].number // empty")
+            [ -n "$pr" ] && break
+            sleep 10
+          done
+          if [ -z "$pr" ]; then echo "no open pull request titled: $TITLE"; exit 1; fi
+          for attempt in 1 2 3 4 5 6; do
+            gh pr merge "$pr" --repo gouz/homebrew-tools --merge && exit 0
+            sleep 10
+          done
+          exit 1

@@ -14,7 +14,15 @@ bgbng down -a            # stop everything
 
 ## Install
 
-Requires [Bun](https://bun.sh) and git. Secrets need an ed25519 or RSA SSH key without passphrase.
+Requires git. Secrets need an ed25519 or RSA SSH key without passphrase.
+
+With [Homebrew](https://brew.sh) (macOS, Linux):
+
+```sh
+brew install gouz/tools/bgbng
+```
+
+From source, with [Bun](https://bun.sh):
 
 ```sh
 git clone git@github.com:gouz/bgbng.git && cd bgbng

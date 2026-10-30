@@ -13,6 +13,7 @@
   "license": "MIT",
   "scripts": {
     "check": "tsc --noEmit",
+    "make:exe": "bun build src/cli.ts --outfile exe/bgbng --compile --minify --no-compile-autoload-dotenv --no-compile-autoload-bunfig",
     "test": "bun test"
   },
   "dependencies": {
