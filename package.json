@@ -3,15 +3,20 @@
   "version": "0.1.0",
   "description": "Parallel dev environments on git worktrees, with per-instance ports and encrypted .env files",
   "type": "module",
-  "bin": { "bgbng": "src/cli.ts" },
-  "repository": { "type": "git", "url": "git+ssh://git@github.com/gouz/bgbng.git" },
+  "bin": {
+    "bgbng": "src/cli.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/gouz/bgbng.git"
+  },
   "license": "MIT",
   "scripts": {
     "check": "tsc --noEmit",
     "test": "bun test"
   },
   "dependencies": {
-    "clipse": "0.2.0"
+    "clipse": "0.2.1"
   },
   "devDependencies": {
     "@types/bun": "^1.4.4",
